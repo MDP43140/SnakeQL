@@ -1,0 +1,44 @@
+<body style="margin:0"><canvas width="400"height="400"id="c"/><script src="SnakeQL.js"></script><script src="SnakeQL_brain.js"></script><script>
+rnd=a=>~~(Math.random()*g);var hiScore=0,scoreGained=0,score=0,dead=0,c=document.getElementById('c'),ct=c.getContext('2d',{alpha:false}),dir,rew,i,g=16,snake={x:10,y:10,dx:1,dy:0,trail:[],cells:4},apple={x:rnd(),y:rnd()};window.onload=window.onresize=()=>{c.width=window.innerWidth;c.height=window.innerHeight}
+draw=x=>{
+	rew = -0.1;
+	if(snake.dx==0&&snake.dy==-1)dir='w';
+	if(snake.dx==0&&snake.dy==1)dir='s';
+	if(snake.dx==-1&&snake.dy==0)dir='a';
+	if(snake.dx==1&&snake.dy==0)dir='d';
+	snake.x += snake.dx;snake.y += snake.dy;
+	if(snake.x<0){snake.x=Math.round(c.width/g)}else if(snake.x >= c.width/g)snake.x=0
+	if(snake.y<0){snake.y=Math.round(c.height/g)}else if(snake.y >= c.height/g)snake.y=0
+	snake.trail.push({x:snake.x,y:snake.y});
+	if(snake.trail.length>snake.cells)snake.trail.shift()
+	ct.clearRect(0,0,c.width,c.height);
+	ct.fillStyle='red';
+	ct.fillRect(apple.x*g,apple.y*g,g,g);
+	ct.fillStyle='#0f0';
+	ct.font = "12px Arial";ct.fillText("HIGH SCORE:"+hiScore,g/2,g);ct.fillText("SCORE GAINED:"+scoreGained,g/2,g*2);ct.fillText("SCORE:"+score,g/2,g*3);ct.fillText("DEAD:"+dead,g/2,g*4);
+	ct.fillStyle='green';
+	snake.trail.forEach((cell,idx)=>{
+		ct.fillRect(cell.x*g,cell.y*g,g,g);//cell.x<g+apple.x&&cell.x>apple.x&&cell.y<g+apple.y&&cell.y>apple.y
+		if(cell.x == apple.x && cell.y == apple.y){rew=1;/*snake.cells++*/;score++;scoreGained++;apple={x:rnd(),y:rnd()};SnakeQL.setConf.fruit(apple);if(score>hiScore){hiScore=score}/*DEBUGconsole.log("AppleX:"+apple.x+" AppleY:"+apple.y)DEBUG*/}
+		for(i=idx+1;i < snake.trail.length;i++){if(cell.x == snake.trail[i].x && cell.y == snake.trail[i].y){dir='';score=0;dead++;snake={x:10,y:10,dx:1,dy:0,trail:[],cells:4};snake.trail.push({x:snake.x,y:snake.y});apple={x:rnd(),y:rnd()};rew=-1}}
+	})
+//for(i=snake.trail.length-1;i--;){if(snake.x == snake.trail[i].x && snake.y == snake.trail[i].y){dir='';score=0;dead++;snake={x:10,y:10,dx:1,dy:0,trail:[],cells:4};snake.trail.push({x:snake.x,y:snake.y});apple={x:rnd(),y:rnd()};rew=-1}}
+	SnakeQL.setConf.trail(snake.trail);//bug: snake dies when trail > 5 with snakeql on (for atleast dead > scoreGained)
+	return rew;
+}
+key=e=>{
+	if(e==37&&dir!='d'){snake.dx=-1;snake.dy=0}
+	else if(e==38&&dir!='s'){snake.dx=0;snake.dy=-1}
+	else if(e==39&&dir!='a'){snake.dx=1;snake.dy=0}
+	else if(e==40&&dir!='w'){snake.dx=0;snake.dy=1}
+};
+window.onkeydown=e=>key(e.which);
+SnakeQL.setConf.availableActs([38,40,37,39]);
+SnakeQL.setConf.player({x:snake.x,y:snake.y});
+SnakeQL.setConf.tileCount(g);
+SnakeQL.setConf.fruit(apple);
+SnakeQL.setConf.rewReturn(draw);
+SnakeQL.setConf.keyPress(key);
+SnakeQL.run(1e3/15);//setInterval(draw,1e2);
+</script>
+</body>
