@@ -16,7 +16,7 @@ var SnakeQL=(x=>{
 		if(fruitRelativPos.y < 0) fruitRelativPos.y += tileCount;
 		else if(fruitRelativPos.y > tileCount) fruitRelativPos.y -= tileCount;
 		maxLength=fullSetOfStats ? trail.length:1;
-		for(i=maxLength;i--;){
+		for(i=maxLength;i--;){//bug:"0undefined,2,...":{...}
 			if(!trailRelativPos[i])trailRelativPos.push({x:0,y:0});
 			trailRelativPos[i].x=trail[i].x - player.x;
 			trailRelativPos[i].y=trail[i].y - player.y;
@@ -49,7 +49,7 @@ var SnakeQL=(x=>{
 			keyPress(act);
 			q1=whichTable(whichStatNow());
 			qTable[currState][act]=q0[act] + learningRate * (rewReturn() + discountFactor * Math.max(q1[38],q1[40],q1[37],q1[39]) - q0[act]);
-		},x)},//BUG: "0,12undefined,6,6":{37:0,38:0,39:0.1} yeahh, u know wut happening, that kinda sucks...
+		},x)},
 		stop:x=>clearInterval(intervalID),
 		reset:x=>qTable={},
 		setConf:{
@@ -68,3 +68,8 @@ var SnakeQL=(x=>{
 		qTable:{export:x=>qTable,import:x=>qTable=x}
 	}
 })();
+/*	
+	Changelog:
+	+ First release
+	- Known Bug: qTable bug ["0undefined,2,...":{...}]
+*/
